@@ -1,0 +1,43 @@
+#!/bin/sh
+
+function die() {
+    echo "$1"
+    exit 1
+}
+
+function unbak() {
+    local unbak_cmd="$1"
+    local bak_name="$2"
+    local orig_name="${bak_name%.bak}"
+
+    "$unbak_cmd" "$bak_name" "$orig_name"
+
+    if [ -f "$bak_name.bak" -a "$unbak_cmd" = "mv" ]; then
+        unbak mv "$bak_name.bak"
+    fi
+}
+
+unbak_cmd="mv"
+
+for arg in "$@"; do
+    case "$arg" in
+        -o)
+            overwrite=1
+            shift
+            ;;
+        -k)
+            unbak_cmd="cp"
+            shift
+            ;;
+    esac
+done
+
+bak_name="$1"
+orig_name="${1%.bak}"
+[ -z "$bak_name" ] && die "No file specified"
+[ -f "$bak_name" ] || die "No such file: $bak_name"
+[ "$bak_name" = "$orig_name" ] && die "File name must end with .bak"
+[ -z "$orig_name" ] && die "Original name will be empty"
+[ -z "$overwrite" -a -f "$orig_name" ] && die "File $orig_name already exists, add -f to overwrite"
+
+unbak "$unbak_cmd" "$bak_name"

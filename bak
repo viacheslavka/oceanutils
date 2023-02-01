@@ -1,0 +1,41 @@
+#!/bin/sh
+
+function die() {
+    echo "$1"
+    exit 1
+}
+
+set -x
+
+function bak() {
+    local bak_cmd="$1"
+    local orig_name="$2"
+    local bak_name="$2.bak"
+
+    if [ -f "$bak_name" -a -z "$overwrite"]; then
+        bak mv "$bak_name"
+    fi
+
+    "$bak_cmd" "$orig_name" "$bak_name"
+}
+
+bak_cmd="mv"
+
+for arg in "$@"; do
+    case "$arg" in
+        -o)
+            overwrite=1
+            shift
+            ;;
+        -k)
+            bak_cmd="cp"
+            shift
+            ;;
+    esac
+done
+
+old_name="$1"
+[ -z "$old_name" ] && die "No file specified"
+[ -f "$old_name" ] || die "No such file: $old_name"
+
+bak "$bak_cmd" "$1"
