@@ -26,7 +26,7 @@ for arg in "$@"; do
             shift
             ;;
         -k)
-            unbak_cmd="cp"
+            unbak_cmd="cp -r"
             shift
             ;;
     esac

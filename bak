@@ -28,7 +28,7 @@ for arg in "$@"; do
             shift
             ;;
         -k)
-            bak_cmd="cp"
+            bak_cmd="cp -r"
             shift
             ;;
     esac
